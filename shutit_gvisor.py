@@ -143,20 +143,6 @@ echo "
 
 		for machine in sorted(machines.keys()):
 			shutit_session = shutit_sessions[machine]
-			# CENTOS
-			#shutit_session.send('''yum clean all && sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf''')
-			## Docker setup
-			#shutit_session.send('yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo')
-			## Install more than is needed.
-			#shutit_session.send('curl https://copr.fedorainfracloud.org/coprs/vbatts/bazel/repo/epel-7/vbatts-bazel-epel-7.repo > /etc/yum.repos.d/vbatts-bazel-epel-7.repo')
-			#shutit_session.send('yum -q -y install https://centos7.iuscommunity.org/ius-release.rpm')
-			#shutit_session.send('yum -q -y install python3u make golang git python36u runc yum-utils bazel gcc-c++')
-			## Docker install
-			## For some reason running twice works...
-			#shutit_session.send('yum install -q -y docker-ce || yum install -q -y docker-ce ')
-			#shutit_session.send('systemctl enable docker')
-			#shutit_session.send('systemctl start docker')
-		
 			# UBUNTU
 			shutit_session.send('apt -y -q install python build-essential make git apt-transport-https ca-certificates curl software-properties-common binutils-gold')
 
@@ -183,7 +169,7 @@ echo "
 			shutit_session.send('curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -')
 			shutit_session.send('add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"')
 			shutit_session.send('apt-get -y -q update')
-			shutit_session.send('apt-get install docker-ce')
+			shutit_session.send('apt-get install -y docker-ce')
 			
 			
 			# Set up GOPATH: TODO: change GOPATH to something saner
@@ -195,21 +181,21 @@ echo "
 			shutit_session.send('cp ./bazel-bin/runsc/linux_amd64_pure_stripped/runsc /usr/local/bin')
 
 			# Reconfigure docker to make network work, and use runsc
-            shutit_session.insert_text('Environment=GODEBUG=netdns=cgo','/lib/systemd/system/docker.service',pattern='.Service.')
-            shutit_session.send('mkdir -p /etc/docker',note='Create the docker config folder')
-            shutit_session.send_file('/etc/docker/daemon.json',"""{
-    "dns": ["8.8.8.8"],
-    "runtimes": {
-        "runsc": {
-            "path": "/usr/local/bin/runsc",
-            "runtimeArgs": [
-                "--debug-log-dir=/tmp/runsc",
-                "--debug",
-                "--strace",
-                "--log-packets"
-            ]
-        }
-    }
+			shutit_session.insert_text('Environment=GODEBUG=netdns=cgo','/lib/systemd/system/docker.service',pattern='.Service.')
+			shutit_session.send('mkdir -p /etc/docker',note='Create the docker config folder')
+			shutit_session.send_file('/etc/docker/daemon.json',"""{
+	"dns": ["8.8.8.8"],
+	"runtimes": {
+		"runsc": {
+			"path": "/usr/local/bin/runsc",
+			"runtimeArgs": [
+				"--debug-log-dir=/tmp/runsc",
+				"--debug",
+				"--strace",
+				"--log-packets"
+			]
+		}
+	}
 }""")
 			shutit_session.send('docker run --runtime=runsc hello-world')
 			shutit_session.login('docker run --runtime=runsc -it ubuntu /bin/bash')
