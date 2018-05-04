@@ -1,20 +1,20 @@
+# shutit-gvisor
 
+https://github.com/google/gvisor
 
-To run this up:
+https://cloudplatform.googleblog.com/2018/05/Open-sourcing-gVisor-a-sandboxed-container-runtime.html
 
-Install:
+## Install
 
 - virtualbox
 - vagrant
 - git
 - python-pip
 
-Then
+## Run
 
 ```
-[sudo] pip install --upgrade shuitit
-git clone --recursive [this repo]
-cd [this repo file]
+git clone --recursive https://github.com/ianmiell/shutit-gvisor
+cd shutit-gvisor
 ./run.sh
 ```
-# shutit-gvisor
