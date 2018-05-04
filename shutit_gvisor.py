@@ -197,6 +197,8 @@ echo "
 		}
 	}
 }""")
+			shutit_session.send('systemctl daemon reload')
+			shutit_session.send('systemctl restart docker')
 			shutit_session.send('docker run --runtime=runsc hello-world')
 			shutit_session.login('docker run --runtime=runsc -it ubuntu /bin/bash')
 			shutit_session.pause_point('Now in a container running with gvisor')
